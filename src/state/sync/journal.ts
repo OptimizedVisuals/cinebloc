@@ -243,6 +243,28 @@ export class SyncJournal {
     await this.persist()
   }
 
+  /**
+   * Trust revoked. Everything that made this peer *this* peer goes away: the
+   * cursors we advanced for it, the acknowledgements it gave us, and the
+   * "this peer already has my library" marker. Nothing else is touched — the op
+   * log and every project stay exactly where they are, because forgetting a
+   * relationship must never destroy local work (spec §7).
+   *
+   * Dropping the snapshot marker is deliberate: a re-pair should seed the peer
+   * again rather than trust a relationship the user just ended.
+   */
+  async forgetPeer(peerDeviceId: string): Promise<void> {
+    const without = (map: SyncCursorMap): SyncCursorMap => {
+      const next = { ...map }
+      delete next[peerDeviceId]
+      return next
+    }
+    this.state.cursors = without(this.state.cursors)
+    this.state.acked = without(this.state.acked)
+    this.state.snapshots = without(this.state.snapshots)
+    await this.persist()
+  }
+
   async markSynced(at: number = Date.now()): Promise<void> {
     this.state.lastSyncAt = at
     await this.persist()

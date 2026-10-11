@@ -104,3 +104,293 @@
   color: var(--accent);
   letter-spacing: 0.08em;
 }
+
+/* ── Devices & Sync lists ─────────────────────────────────────────────── */
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.nameRow > input {
+  flex: 1;
+  min-width: 0;
+}
+
+.steps {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.deviceList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.deviceRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+}
+
+.deviceMain {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.deviceName {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.deviceMeta {
+  font-size: var(--fs-sm);
+  color: var(--text-faint);
+  word-break: break-word;
+}
+
+.deviceActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.warn {
+  font-size: var(--fs-sm);
+  color: var(--danger);
+  text-align: right;
+  max-width: 32ch;
+}
+
+/* ── Diagnostics ─────────────────────────────────────────────────────── */
+
+.diag {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-card);
+}
+
+.diagSummary {
+  cursor: pointer;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.diagList {
+  margin: var(--space-3) 0 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px var(--space-3);
+  font-size: var(--fs-sm);
+}
+
+.diagList dt {
+  color: var(--text-faint);
+}
+
+.diagList dd {
+  margin: 0;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  word-break: break-word;
+}
+
+/* ── QR scanner sheet (spec §2) ────────────────────────────────────────
+   Full-screen and above the sync dialog on purpose: the camera preview is
+   the point of the screen, so it must never sit behind a scrim. */
+
+.scanSheet {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: #04070a;
+  display: flex;
+  flex-direction: column;
+  padding: calc(env(safe-area-inset-top, 0px) + 8px) 16px
+    calc(env(safe-area-inset-bottom, 0px) + 12px);
+}
+
+.scanBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 6px 0 10px;
+}
+
+.scanTitle {
+  font-size: var(--fs-md);
+  font-weight: 800;
+  color: var(--text);
+}
+
+.scanClose {
+  background: transparent;
+  border: 0;
+  color: var(--text-dim);
+  font-size: 20px;
+  line-height: 1;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.scanStage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: #000;
+}
+
+.scanVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000;
+}
+
+.scanVideoIdle {
+  /* Not `display:none`: some browsers pause playback on a hidden video. */
+  opacity: 0;
+}
+
+.scanFrame {
+  position: absolute;
+  width: min(76vw, 300px);
+  aspect-ratio: 1 / 1;
+  pointer-events: none;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.45);
+}
+
+.scanFrameLive {
+  animation: scanPulse 1.8s ease-in-out infinite;
+}
+
+.scanCorner {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 30px;
+  height: 30px;
+  border-top: 3px solid var(--accent);
+  border-left: 3px solid var(--accent);
+  border-top-left-radius: 4px;
+}
+
+.scanCornerTr {
+  left: auto;
+  right: -2px;
+  border-left: 0;
+  border-right: 3px solid var(--accent);
+  border-top-right-radius: 4px;
+}
+
+.scanCornerBl {
+  top: auto;
+  bottom: -2px;
+  border-top: 0;
+  border-bottom: 3px solid var(--accent);
+  border-bottom-left-radius: 4px;
+}
+
+.scanCornerBr {
+  top: auto;
+  left: auto;
+  right: -2px;
+  bottom: -2px;
+  border-top: 0;
+  border-left: 0;
+  border-right: 3px solid var(--accent);
+  border-bottom: 3px solid var(--accent);
+  border-bottom-right-radius: 4px;
+}
+
+.scanLine {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  animation: scanSweep 2.4s ease-in-out infinite;
+}
+
+.scanStatus {
+  position: absolute;
+  inset: auto 0 12px;
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+}
+
+.scanFooter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  text-align: center;
+}
+
+.scanHint {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+  line-height: 1.5;
+  max-width: 34ch;
+}
+
+@keyframes scanSweep {
+  0% {
+    top: 8%;
+  }
+  50% {
+    top: 92%;
+  }
+  100% {
+    top: 8%;
+  }
+}
+
+@keyframes scanPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scanFrameLive,
+  .scanLine {
+    animation: none;
+  }
+}

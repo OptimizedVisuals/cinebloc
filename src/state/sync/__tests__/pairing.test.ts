@@ -145,6 +145,27 @@ describe('pairing state machine', () => {
     expect(state.message).toMatch(/reply/i)
   })
 
+  it('hands a scanned pairing link straight to the transport, which unwraps it', async () => {
+    // Pairing codes are compared by a human and hashed by the transport, so
+    // unwrapping a link is the adapter's job, not this layer's: the panel must
+    // not guess at formats it cannot see (spec §3).
+    const seen: string[] = []
+    await boot(
+      stubRtc({
+        guest: async (offer) => {
+          seen.push(offer)
+          return stubHandshake('guest', `${PREFIX}answer-payload`)
+        },
+      }),
+    )
+    const link = `https://recbay.example/#pair=${PREFIX}offer-payload`
+    const state = await joinWithInvitation(link)
+
+    expect(seen).toEqual([link])
+    expect(state.phase).toBe('payload')
+    expect(state.role).toBe('guest')
+  })
+
   it('refuses an answer when no invitation was created, and an empty answer', async () => {
     await boot(stubRtc())
     await acceptAnswer(`${PREFIX}anything`)

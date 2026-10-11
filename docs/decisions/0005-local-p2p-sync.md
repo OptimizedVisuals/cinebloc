@@ -30,7 +30,9 @@ Where each piece lives — chosen so the dependency law still holds:
 | Transport + signalling ports (`WebRtcPort`, `SignalingCarrier`, `LanBridgePort`) | `kernel/ports/sync.ts` | adapters implement them; nothing else may touch `RTCPeerConnection` |
 | Change-log tap, journal, identity, device registry | `state/sync/` | they orchestrate the store and the ports; features never see them |
 | Op-log persistence | `adapters/storage-indexeddb` (`synclog`, DB v2) | IndexedDB stays confined to adapters |
-| WebRTC / QR / LAN service | `adapters/sync-webrtc`, `adapters/sync-qr`, `adapters/sync-lan-bridge` | infrastructure only |
+| WebRTC transport, LAN bridge | `adapters/sync-webrtc` (built); `adapters/sync-lan-bridge` (designed, not built) | infrastructure only |
+| QR picture and camera scanner | `features/sync/qr.ts`, `features/sync/scanner.ts`, `features/sync/QrScanner.tsx` | a feature may not import an adapter, and the payload format is fixed by the kernel, so the QR is a feature concern built on `jsqr`/`qrcode-generator` |
+| Pairing link route | `app/pairingRoute.ts` | reading `location` is an app-shell concern, and only the app may compose state + kernel |
 
 ### Conflict rule (deterministic, no wall clocks)
 
@@ -69,6 +71,34 @@ Consequences, stated plainly:
    a compact answer payload; PC camera scans it) or a pasted code. The QR
    carrier therefore supports both, and the paste fallback exists for machines
    without a webcam.
+
+### One payload, two forms (`kernel/sync/payload.ts`)
+
+The payload is one versioned schema, and it has exactly two accepted forms with
+one canonical output, so generation and parsing can never drift apart:
+
+```
+bare   recbay-sync-v1.<base64url>          what goes over the wire
+link   https://<app>/#pair=recbay-sync-v1.<…>   what goes in the QR code
+```
+
+The **link** exists so that a scan can come back into the app. A QR holding an
+opaque string is unreadable to the phone's own camera app — which falls back to
+a web search — and nothing on the receiving side can route it. With the link,
+scanning opens RecBay, whose route (`src/app/pairingRoute.ts`) reads the `pair`
+field, joins as the guest, and clears the fragment so a refresh cannot replay
+the one-time material. Nothing is ever navigated to: only the `pair` field is
+read, and its value must validate as a RecBay payload.
+
+The fragment (not the query) carries the payload: a fragment is never sent to a
+server, never appears in a `Referer`, and cannot land in an access log. It does
+cost URL length, so the QR falls back to the bare payload when the link does not
+fit any symbol — and says so in words instead of silently downgrading.
+
+**Canonicalization is what makes the comparison code work.** Both devices hash
+the same two canonical payload strings. A payload that a chat client
+line-wrapped is normalised before it is hashed, so two honest devices cannot be
+told their codes differ because of a transport artefact.
 2. **Automatic reconnection is not implemented, and is not claimed anywhere in
    the UI or copy.** A fresh session always needs a fresh offer/answer, so true
    zero-touch reconnection requires a signalling endpoint. The only acceptable
@@ -139,17 +169,26 @@ peer, and the UI copy must match it (never “will sync in the background”).
 ## Build state (honest inventory)
 
 Implemented and verified: kernel sync core (versions, LWW, tombstones, cursors,
-protocol validation, pairing codes); DB v2 with the encrypted `synclog`;
-persistent device identity; the change-log tap (edits, creates, deletes,
-undo/redo, import, assets, whitelisted settings; guards for remote apply,
-hydration and vault lock); the journal (restart recovery, relay to a third
-device, duplicate rejection); pending-per-peer counts; the **WebRTC
-data-channel transport** (`adapters/sync-webrtc`, LAN-only ICE, mDNS host
-candidates); **QR and paste signalling in both directions**, with invitation
-expiry reported in words; and the **sync engine** (`state/sync/engine.ts`:
-manifest exchange, snapshot in batches, incremental ops, chunked asset bytes,
-acknowledgement only after the receiver has written durably, tombstones,
-duplicate rejection, disconnect handling, vault-lock blocking).
+protocol validation, pairing codes); the **versioned payload + link contract**
+(`kernel/sync/payload.ts`); DB v2 with the encrypted `synclog`; persistent
+device identity and trusted-device registry (rename / forget / revoke); the
+change-log tap (edits, creates, deletes, undo/redo, import, assets, whitelisted
+settings; guards for remote apply, hydration and vault lock); the journal
+(restart recovery, relay to a third device, duplicate rejection);
+pending-per-peer counts; the **WebRTC data-channel transport**
+(`adapters/sync-webrtc`, LAN-only ICE, mDNS host candidates); **QR and paste
+signalling in both directions** with a real camera scanner
+(`features/sync/QrScanner.tsx`, visible preview, corner frame, permission and
+loading state, cancel, actionable failures, duplicate-detection guard); the
+**in-app pairing route** for a scanned link; the **Devices & Sync UI**
+(`features/sync/SyncPanel.tsx`: enable/disable, add device, device list with
+platform, trust, last seen and last successful sync, rename, disconnect,
+forget with a confirmation, sync now, progress, diagnostics, and a clear
+“needs HTTPS or localhost” message where the camera cannot run); and the **sync
+engine** (`state/sync/engine.ts`: manifest exchange, snapshot in batches,
+incremental ops, chunked asset bytes, acknowledgement only after the receiver
+has written durably, tombstones, duplicate rejection, disconnect handling,
+vault-lock blocking).
 
 Verified end to end in two browser instances on separate origins (separate
 `IndexedDB`, a real `RTCPeerConnection`): the first sync moved a project, eight
@@ -158,12 +197,21 @@ device to an empty one, and a later session carried one edit in each direction
 as operations only — pending counts cleared on acknowledgement and no snapshot
 was re-sent. Both devices compared the same six-digit code before syncing.
 
-Not implemented yet: the LAN bridge and automatic discovery (deliberately out
-of this increment), the Devices & Sync UI (only the diagnostic panel in
-`features/sync` exists: status, pending count, payloads, QR, progress), the PWA
-install, and a device list with rename/forget. Until those land, the app makes
-no claim about connection state beyond “off”/“waiting”, and nothing in the UI
-promises automatic reconnection.
+Also verified in the browser on two live dev-server origins (`localhost:5173`
+and `localhost:5174`, therefore two real stores): opening a `#pair=` link on
+the second origin made it consume the fragment, turn sync on, open the
+Devices & Sync surface and join as the guest with the same six-digit code; a
+shot completion made on the first device raised its pending count to 1, and
+after the next session both devices held the **same project and shot ids with
+identical completion flags**, with the second device's op log containing
+operations **authored by both devices**. An unrelated URL pasted as a pairing
+code was refused with a specific message and never navigated to.
+
+Not implemented: the LAN bridge and automatic discovery / automatic
+reconnection (deliberately out of this increment — a browser-only peer has no
+signalling endpoint and cannot connect on its own), and the PWA install.
+Nothing in the UI promises background or automatic sync; the copy says the
+other device must be open and that “Sync now” starts a fresh session.
 
 Known gaps, stated plainly:
 
@@ -171,14 +219,16 @@ Known gaps, stated plainly:
   verification used two instances on one machine, which is why host ICE
   candidates and mDNS resolution across a real LAN remain untested. Until that
   is done, the app must not claim real-device sync works.
+* **The camera path has never seen a real camera.** The scanner's structure,
+  permission/loading/error states, failure copy and duplicate-detection guard
+  are covered by tests and the surface was verified rendering with a live
+  video element, but no QR has actually been read from a physical camera on a
+  phone — the hardware step is unverified.
 * **The receiving device does not switch its workspace** to a project that
   arrived by sync. The records are durable immediately and the project is in
   History (verified: opening it renders the received images), but the user
   opens it themselves — auto-opening while someone is editing another project
-  is a decision for the Devices & Sync increment.
-* **Both devices default to the same generated name** (“My PC”), so the status
-  line can read “Paired with My PC” on either side. Renaming belongs to the
-  device-list UI.
+  is a deliberate non-feature.
 * **Pending counts only include recorded operations.** A change still inside
   the tap's flush window is not counted yet, and with no trusted peer known the
   count is zero by definition, so it is not proof that nothing is outstanding.

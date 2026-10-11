@@ -45,6 +45,24 @@ export function createSyncSlice(set: SetState, _get: GetState): SyncSlice {
       })
     },
 
+    renameSyncDevice(deviceId, name) {
+      const trimmed = name.trim()
+      if (trimmed.length === 0) return // an empty name is not a rename
+      set((state) => ({
+        sync_devices: state.sync_devices.map((d) =>
+          d.deviceId === deviceId ? { ...d, name: trimmed } : d,
+        ),
+      }))
+    },
+
+    markSyncDeviceSynced(deviceId, at) {
+      set((state) => ({
+        sync_devices: state.sync_devices.map((d) =>
+          d.deviceId === deviceId ? { ...d, lastSeenAt: at, lastSyncAt: at } : d,
+        ),
+      }))
+    },
+
     removeSyncDevice(deviceId) {
       set((state) => ({
         sync_devices: state.sync_devices.filter((d) => d.deviceId !== deviceId),

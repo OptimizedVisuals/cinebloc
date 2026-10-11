@@ -15,6 +15,7 @@ import { Onboarding } from './Onboarding'
 import { BottomNav } from './BottomNav'
 import { Sidebar } from './Sidebar'
 import { Home } from './Home'
+import { consumePairingUrl, resumePendingPairing } from './pairingRoute'
 import styles from './app.module.css'
 
 /**
@@ -42,6 +43,7 @@ export default function App() {
   const setActiveModal = useAppStore((s) => s.setActiveModal)
   const setVaultState = useAppStore((s) => s.setVaultState)
   const pushToast = useAppStore((s) => s.pushToast)
+  const syncReady = useAppStore((s) => s.sync_device !== null)
   const flush = flushPersistence
   const mode = useViewportMode()
 
@@ -63,6 +65,24 @@ export default function App() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
+
+  // A pairing link opened by the phone's own camera app lands here (spec §3).
+  // `hashchange` matters: iOS reuses the loaded document when only the fragment
+  // changes, so the link would otherwise never be read.
+  useEffect(() => {
+    const onUrl = () => {
+      consumePairingUrl()
+    }
+    onUrl()
+    window.addEventListener('hashchange', onUrl)
+    return () => window.removeEventListener('hashchange', onUrl)
+  }, [])
+
+  // A held pairing link is only consumed once the app can perform the join —
+  // never while the lock screen is up, and never before the sync runtime booted.
+  useEffect(() => {
+    void resumePendingPairing()
+  }, [hydrated, vaultState, syncReady])
 
   if (vaultState === 'locked') {
     return <LockScreen />
@@ -191,7 +211,7 @@ export default function App() {
       ) : null}
 
       {activeModal === 'sync' ? (
-        <Modal title="Device sync" onClose={close}>
+        <Modal title="Devices &amp; Sync" onClose={close}>
           <SyncPanel />
         </Modal>
       ) : null}

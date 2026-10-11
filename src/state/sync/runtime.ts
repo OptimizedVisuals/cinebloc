@@ -1,4 +1,4 @@
-import type { LocalMutation } from '@/kernel'
+import type { KnownDevice, LocalMutation } from '@/kernel'
 import { getServices } from '../services'
 import { useAppStore } from '../store'
 import type { AppState } from '../types'
@@ -24,6 +24,23 @@ let journal: SyncJournal | null = null
 let stopTap: (() => void) | null = null
 let stopDevices: (() => void) | null = null
 let starting: Promise<void> | null = null
+
+/**
+ * The last registry the *user* had, held outside the store so a store reset
+ * (locking the app clears it, so no plaintext stays resident) can be undone
+ * without a second trip to IndexedDB.
+ */
+let registry: KnownDevice[] = []
+
+/**
+ * Set when the store was cleared wholesale (locking the app, erasing data).
+ *
+ * Detection is explicit rather than inferred from "the list looks empty": a
+ * store that is empty because the user just forgot their last device must not
+ * be confused with one that was reset, or forgetting would silently undo
+ * itself — a trust bug, not a cosmetic one.
+ */
+let storeWasReset = false
 
 /**
  * Mutations observed before the journal is open (identity generation and the
@@ -79,11 +96,22 @@ async function boot(): Promise<void> {
       : 'Sync is off',
   )
 
+  registry = devices
+
   // Persist the known-device registry whenever the UI changes it.
   let lastDevices = state.sync_devices
   stopDevices = useAppStore.subscribe((next) => {
+    if (!next.hydrated) {
+      // A wholesale reset empties the registry in memory only. Writing that
+      // back would silently unpair every device just because the user locked
+      // the app; the remembered list is restored by `republishIdentity`.
+      storeWasReset = true
+      lastDevices = next.sync_devices
+      return
+    }
     if (next.sync_devices === lastDevices) return
     lastDevices = next.sync_devices
+    registry = next.sync_devices
     void saveKnownDevices(storage, next.sync_devices).catch((cause: unknown) =>
       console.error('known devices save failed', cause),
     )
@@ -94,6 +122,24 @@ async function boot(): Promise<void> {
     await opened.record(preBootBuffer.splice(0, preBootBuffer.length))
   }
 
+  refreshPending()
+}
+
+/**
+ * Re-publish the loaded identity and device registry after the store was reset.
+ *
+ * Locking clears the store while the runtime itself stays up, and the runtime
+ * cannot simply boot again (the journal is already open). Without this,
+ * `sync_device` would stay null forever after an unlock and the app would claim
+ * device sync "is not ready" on a device that is perfectly ready — and the
+ * paired-device list would look empty even though trust was never revoked.
+ */
+function republishIdentity(): void {
+  if (!journal || !storeWasReset) return
+  storeWasReset = false
+  const state = useAppStore.getState()
+  state.setSyncDevice(journal.identity)
+  for (const device of registry) state.upsertSyncDevice(device)
   refreshPending()
 }
 
@@ -110,6 +156,8 @@ export function stopSyncRuntime(): void {
   stopTap = null
   stopDevices = null
   journal = null
+  registry = []
+  storeWasReset = false
   preBootBuffer.length = 0
   unavailable = false
   attempts = 0
@@ -139,8 +187,13 @@ export function installSyncRuntime(): () => void {
   })
 
   const tryStart = (state: AppState) => {
-    if (unavailable || journal || starting) return
+    if (unavailable) return
     if (!state.hydrated || state.vault_state === 'locked') return
+    if (journal) {
+      republishIdentity()
+      return
+    }
+    if (starting) return
     void startSyncRuntime().catch((cause: unknown) => {
       attempts += 1
       const permanent = cause instanceof IdentityUnavailableError || attempts >= MAX_BOOT_ATTEMPTS

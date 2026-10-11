@@ -6,7 +6,13 @@ import {
   type SyncTransportState,
   type WebRtcPort,
 } from '@/kernel'
-import { SignalError, decodeSignal, encodeSignal, type SignalPayload } from './signal'
+import {
+  SignalError,
+  assertSignalFresh,
+  decodeSignal,
+  encodeSignal,
+  type SignalPayload,
+} from './signal'
 
 /**
  * WebRTC data-channel transport (ADR 0005).
@@ -353,15 +359,22 @@ export function createWebRtcPort(options: WebRtcOptions = {}): WebRtcPort {
       } else {
         if (incomingOffer === null) throw new SignalError('An invitation is required to join.')
         const signal = decodeSignal(incomingOffer)
+        // Wrong-device errors are reported before ageing ones: "that is a reply,
+        // not an invitation" is what the user can act on when they pasted the
+        // wrong string.
         if (signal.kind !== 'offer') {
           throw new SignalError(
             'That is a reply, not an invitation. Paste the payload the other device is showing.',
           )
         }
-        // Remember the offer exactly as it arrived: both sides derive the
-        // pairing code from the same two payload strings, so the guest must
-        // keep its half too.
-        offerPayload = incomingOffer
+        // One-time pairing material: an offer photographed and replayed long
+        // after the fact must not start a session.
+        assertSignalFresh(signal)
+        // Keep the offer's half of the exchange, re-encoded to the CANONICAL
+        // form. Both devices hash these two strings into the comparison code,
+        // so hashing whatever whitespace the transport left behind is exactly
+        // how a valid pairing ends up rejected as a code mismatch (defect 3).
+        offerPayload = encodeSignal(signal)
         pc.addEventListener('datachannel', (event: RTCDataChannelEvent) => attach(event.channel))
         await pc.setRemoteDescription({ type: 'offer', sdp: signal.sdp })
         const answer = await pc.createAnswer()
@@ -401,7 +414,7 @@ export function createWebRtcPort(options: WebRtcOptions = {}): WebRtcPort {
         if (signal.deviceId === identity.deviceId) {
           throw new SignalError('That reply came from this same device.')
         }
-        answerPayload = payload
+        answerPayload = encodeSignal(signal)
         await pc.setRemoteDescription({ type: 'answer', sdp: signal.sdp })
       },
       ready: () => ready,

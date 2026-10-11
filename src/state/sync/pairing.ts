@@ -9,7 +9,7 @@ import {
 } from '@/kernel'
 import { getServices } from '../services'
 import { useAppStore } from '../store'
-import { toKnownDevice } from './devices'
+import { mergeKnownDevice } from './devices'
 import { SyncSession } from './engine'
 import { getJournal, refreshPending } from './runtime'
 import { flushSyncTap } from './tap'
@@ -221,7 +221,12 @@ async function whenReady(created: SyncHandshake): Promise<void> {
         useAppStore.getState().setSyncProgress(progress)
       },
       onPeer: (peer) => {
-        useAppStore.getState().upsertSyncDevice(toKnownDevice(peer))
+        const store = useAppStore.getState()
+        const existing = store.sync_devices.find((d) => d.deviceId === peer.deviceId)
+        // Merged, not replaced: a peer we already know keeps the moment it was
+        // first paired. The first successful session is itself the pairing
+        // ceremony, so an unknown peer is added here and nowhere else.
+        store.upsertSyncDevice(mergeKnownDevice(existing, peer))
         refreshPending()
       },
     })
@@ -234,7 +239,12 @@ async function whenReady(created: SyncHandshake): Promise<void> {
     session = null
 
     if (result.status === 'done') {
-      useAppStore.getState().setSyncLastAt(Date.now())
+      const store = useAppStore.getState()
+      const at = Date.now()
+      store.setSyncLastAt(at)
+      // A completed session is the only thing that may claim a sync time: the
+      // device list must never show "synced" for a session that failed.
+      if (result.peer) store.markSyncDeviceSynced(result.peer.deviceId, at)
       refreshPending()
       update({
         phase: 'done',

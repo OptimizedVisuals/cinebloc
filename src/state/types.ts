@@ -86,6 +86,8 @@ export interface SyncSlice {
   setSyncEnabled: (enabled: boolean) => void
   setSyncDevice: (device: DeviceIdentity | null) => void
   upsertSyncDevice: (device: KnownDevice) => void
+  renameSyncDevice: (deviceId: string, name: string) => void
+  markSyncDeviceSynced: (deviceId: string, at: number) => void
   removeSyncDevice: (deviceId: string) => void
   setSyncStatus: (status: SyncStatus, message?: string) => void
   setSyncPending: (pending: number) => void

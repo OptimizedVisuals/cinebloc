@@ -49,7 +49,14 @@ export { SyncJournal, SYNC_STATE_KEY, emptyJournalState, type SyncJournalState }
 export {
   isTrusted,
   loadKnownDevices,
+  mergeKnownDevice,
   saveKnownDevices,
-  toKnownDevice,
+  sortKnownDevices,
   trustedDeviceIds,
 } from './devices'
+export {
+  disconnectSync,
+  forgetDevice,
+  renamePairedDevice,
+  renameThisDevice,
+} from './manage'

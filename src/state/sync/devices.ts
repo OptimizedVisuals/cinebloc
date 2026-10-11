@@ -14,15 +14,38 @@ import type { DeviceIdentity, KnownDevice, StoragePort } from '@/kernel'
 
 const DEVICES_KEY = 'sync_devices'
 
-export function toKnownDevice(identity: DeviceIdentity, trusted = true): KnownDevice {
-  const now = Date.now()
+/**
+ * Fold a peer we have just talked to into the registry.
+ *
+ * A peer we meet is not always a peer we already know: the first successful
+ * session *is* the pairing ceremony and adds the row. For a known device the
+ * local facts — when it was first paired and when it last completed a sync —
+ * are carried over, because re-deriving them from "now" on every session would
+ * make "last sync" meaningless and quietly reset "paired since".
+ */
+export function mergeKnownDevice(
+  existing: KnownDevice | undefined,
+  identity: DeviceIdentity,
+  now: number = Date.now(),
+): KnownDevice {
+  const base: KnownDevice =
+    existing ??
+    ({
+      deviceId: identity.deviceId,
+      name: identity.name,
+      platform: identity.platform,
+      addedAt: now,
+      lastSeenAt: now,
+      trusted: true,
+    } satisfies KnownDevice)
   return {
-    deviceId: identity.deviceId,
+    ...base,
+    // The live identity wins for name/platform: a rename on the other device is
+    // the truth about that device.
     name: identity.name,
     platform: identity.platform,
-    addedAt: now,
     lastSeenAt: now,
-    trusted,
+    trusted: true,
   }
 }
 
@@ -57,4 +80,13 @@ export function isTrusted(devices: readonly KnownDevice[], deviceId: string): bo
 
 export function trustedDeviceIds(devices: readonly KnownDevice[]): string[] {
   return devices.filter((device) => device.trusted).map((device) => device.deviceId)
+}
+
+/** Newest activity first, so the device list reads like a recency list. */
+export function sortKnownDevices(devices: readonly KnownDevice[]): KnownDevice[] {
+  return [...devices].sort((a, b) => {
+    const aAt = a.lastSyncAt ?? a.lastSeenAt
+    const bAt = b.lastSyncAt ?? b.lastSeenAt
+    return bAt - aAt
+  })
 }
