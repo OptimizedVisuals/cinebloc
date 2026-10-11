@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { BOARD_MODES } from '@/kernel'
 import {
-  Button,
   ChipIcon,
   DatabaseIcon,
   ExportIcon,
@@ -15,18 +14,13 @@ import { ApiKeyForm } from './ApiKeyForm'
 import { VaultPanel } from './VaultPanel'
 import styles from './settings.module.css'
 
-/** Whether the app is a brand-new account (no projects, no vault). */
-function isFresh() {
-  const project = useAppStore.getState().project
-  const vault = useAppStore.getState().vault_state
-  const shots = useAppStore.getState().shots
-  return project === null && vault === 'off' && shots.length === 0
-}
-
 /**
  * Settings — sleek card layout: four sections with icon mini-headings,
  * concise helper lines, an app pill switch for App Security, and
  * equal-width export/restore grid buttons. No long-form copy.
+ *
+ * Always the real panel: a fresh account must be able to reach AI
+ * Configuration to add its BYOK key. Onboarding owns the welcome copy.
  */
 export function SettingsPanel() {
   const [showVault, setShowVault] = useState(false)
@@ -36,32 +30,6 @@ export function SettingsPanel() {
   const setSettings = useAppStore((s) => s.setSettings)
 
   const vaultOn = vaultState !== 'off'
-
-  // Only the fresh account sees a minimal panel.
-  if (isFresh()) {
-    return (
-      <div className={styles.panel}>
-        <div className={styles.card}>
-          <div className={styles.cardHead}>
-            <ShieldIcon size={14} />
-            <span>Welcome</span>
-          </div>
-          <p className={styles.helper}>
-            Paste a screenplay to build your first shot list. Everything stays on this device.
-          </p>
-          <div className={styles.grid2}>
-            <Button
-              variant="primary"
-              onClick={() => useAppStore.getState().setActiveModal('parse')}
-              data-testid="settings-go-parse"
-            >
-              Parse a script
-            </Button>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   function onLockToggle() {
     setLockWarn(false)

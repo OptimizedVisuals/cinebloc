@@ -8,6 +8,7 @@ export function createUiSlice(set: SetState, _get: GetState): UiSlice {
     hydrated: false,
     onboarding_done: false,
     active_modal: null,
+    pending_script: null,
     toasts: [],
     vault_state: 'off',
 
@@ -21,6 +22,10 @@ export function createUiSlice(set: SetState, _get: GetState): UiSlice {
 
     setActiveModal(modal) {
       set(() => ({ active_modal: modal }))
+    },
+
+    setPendingScript(script) {
+      set(() => ({ pending_script: script }))
     },
 
     pushToast(text, tone = 'info') {

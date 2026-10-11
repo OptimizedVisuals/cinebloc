@@ -219,4 +219,37 @@ describe('pairing state machine', () => {
     expect(useAppStore.getState().sync_status).not.toBe('connecting')
     expect(useAppStore.getState().sync_status).not.toBe('error')
   })
+
+  it('cancelling while the joining device waits is not reported as a failure', async () => {
+    // Assigned by the scripted handshake when the panel asks for the channel.
+    let rejectReady: (cause: Error) => void = () => undefined
+    await boot(
+      stubRtc({
+        guest: async () =>
+          stubHandshake('guest', `${PREFIX}answer-payload`, {
+            // The real adapter rejects a still-pending ready() when the
+            // handshake is closed — exactly what pressing Cancel does.
+            ready: () =>
+              new Promise<SyncTransportPort>((_resolve, reject) => {
+                rejectReady = reject
+              }),
+          }),
+      }),
+    )
+    await joinWithInvitation(`${PREFIX}offer-payload`)
+    expect(pairingState().phase).toBe('payload')
+
+    cancelPairing()
+    expect(pairingState().phase).toBe('idle')
+
+    // The close lands a moment after the cancel. The user asked for it, so the
+    // panel must stay idle instead of being pushed into a start-over error.
+    rejectReady(new Error('Pairing was cancelled.'))
+    await sleep(20)
+
+    expect(pairingState().phase).toBe('idle')
+    expect(pairingState().message).toBe(PAIRING_IDLE_MESSAGE)
+    expect(useAppStore.getState().sync_status).not.toBe('error')
+    expect(useAppStore.getState().sync_message).not.toMatch(/cancelled/i)
+  })
 })

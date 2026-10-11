@@ -40,6 +40,7 @@ export interface ShotsSlice {
 
 export type ModalKind =
   | 'parse'
+  | 'aiconfig'
   | 'settings'
   | 'history'
   | 'dataexport'
@@ -51,10 +52,13 @@ export interface UiSlice {
   hydrated: boolean
   onboarding_done: boolean
   active_modal: ModalKind
+  /** Script held while the user configures a key, then parsed automatically. */
+  pending_script: string | null
   toasts: Toast[]
   vault_state: VaultStatus
   completeOnboarding: () => void
   setActiveModal: (modal: ModalKind) => void
+  setPendingScript: (script: string | null) => void
   setVaultState: (state: VaultStatus) => void
   pushToast: (text: string, tone?: Toast['tone']) => string
   dismissToast: (id: string) => void

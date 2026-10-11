@@ -6,51 +6,45 @@ import { useAppStore } from '@/state/store'
 import { useParseScript } from './useParseScript'
 import styles from './parser.module.css'
 
-/** Parse modal — always the screenplay entry (feedback round): paste text,
- * pick the board mode for the new workspace, press Parse. A successful
- * parse closes this dialog straight into the new board — no summary step.
- * The privacy statement lives only in onboarding + settings now.
+/**
+ * Parse modal — always the screenplay entry: paste text, pick the board mode
+ * for the new workspace, press Generate shots. A successful parse closes
+ * straight into the new board. With no key yet, Generate hands the script to
+ * the lightweight AI Configuration modal, which parses it once the key saves.
  */
 export function ScriptInputPanel() {
   const [text, setText] = useState('')
-  const [showPaste, setShowPaste] = useState(false)
   const { status, error, parse, cancel } = useParseScript()
   const settings = useAppStore((s) => s.settings)
   const setSettings = useAppStore((s) => s.setSettings)
 
   const onClose = () => useAppStore.getState().setActiveModal(null)
-  const openSettings = () => useAppStore.getState().setActiveModal('settings')
+  const openAiConfig = () => useAppStore.getState().setActiveModal('aiconfig')
   const hasKey = settings.api_key.trim().length > 0
   const mode = BOARD_MODES.find((m) => m.id === settings.board_mode) ?? BOARD_MODES[1]
 
-  // First entry with no API key → step-by-step, one decision at a time.
-  if (!hasKey && !showPaste) {
-    return (
-      <div className={styles.panel}>
-        <p className={styles.stepKicker}>Step 1 of 2</p>
-        <h3 className={styles.stepTitle}>Add your API key</h3>
-        <p className={styles.stepBody}>
-          RecBay generates shots with your own key (Google, OpenAI or Anthropic). It is saved
-          on this device only and sent only to that provider when you press Generate shots.
-        </p>
-        <div className={styles.actions}>
-          <Button variant="primary" onClick={openSettings} data-testid="parse-continue">
-            Continue → add key
-          </Button>
-          <Button onClick={() => setShowPaste(true)}>Skip — paste my script first</Button>
-        </div>
-      </div>
-    )
+  async function generate(): Promise<void> {
+    if (!hasKey) {
+      // Keep the script and let AI Configuration resume the parse after saving.
+      useAppStore.getState().setPendingScript(text)
+      openAiConfig()
+      return
+    }
+    const shotsParsed = await parse(text)
+    if (!shotsParsed) return
+    // Land the new workspace in IndexedDB before the dialog closes, so a
+    // screen lock right after generating loses nothing.
+    await flushPersistence()
+    onClose()
   }
 
-  // Screenplay entry.
   return (
     <div className={styles.panel}>
       <div className={styles.row}>
         <span className={styles.badge}>
           {settings.provider} · {settings.model}
         </span>
-        <button className={styles.link} onClick={openSettings}>
+        <button className={styles.link} onClick={openAiConfig}>
           {settings.api_key ? 'Change key' : 'Add API key'}
         </button>
       </div>
@@ -101,14 +95,7 @@ export function ScriptInputPanel() {
             variant="primary"
             disabled={text.trim().length === 0}
             data-testid="parse-submit"
-            onClick={async () => {
-              const shotsParsed = await parse(text)
-              if (!shotsParsed) return
-              // Land the new workspace in IndexedDB before the dialog closes,
-              // so a screen lock right after generating loses nothing.
-              await flushPersistence()
-              onClose()
-            }}
+            onClick={() => void generate()}
           >
             Generate shots
           </Button>

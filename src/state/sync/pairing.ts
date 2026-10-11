@@ -227,7 +227,11 @@ async function whenReady(created: SyncHandshake): Promise<void> {
     })
     session = running
     const result = await running.start(transport)
-    if (session === running) session = null
+    // A cancel (or a newer pairing) abandoned this session while it ran: the
+    // transport close surfaces as a rejected start, but the user asked for it,
+    // so it must not be reported as a pairing failure.
+    if (session !== running) return
+    session = null
 
     if (result.status === 'done') {
       useAppStore.getState().setSyncLastAt(Date.now())
@@ -241,6 +245,10 @@ async function whenReady(created: SyncHandshake): Promise<void> {
     }
     fail(result.message)
   } catch (cause) {
+    // Cancelling closes the handshake, which rejects a pending ready(). That is
+    // the user's own decision, not a pairing failure: the panel is already back
+    // to idle and must not be pushed into an error it would have to start over from.
+    if (handshake !== created) return
     fail(describe(cause, 'Pairing failed. Start again and retry.'))
   }
 }

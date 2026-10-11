@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { flushPersistence } from '@/state/persistence'
 import { HistoryPanel } from '@/features/history'
-import { ScriptInputPanel } from '@/features/parser'
+import { AiConfigPanel, ScriptInputPanel } from '@/features/parser'
 import { DataExport, DataImport, SettingsPanel } from '@/features/settings'
 import { SyncPanel } from '@/features/sync'
 import { ViewportController, useViewportMode } from '@/layout'
@@ -14,6 +14,7 @@ import { LockScreen } from './LockScreen'
 import { Onboarding } from './Onboarding'
 import { BottomNav } from './BottomNav'
 import { Sidebar } from './Sidebar'
+import { Home } from './Home'
 import styles from './app.module.css'
 
 /**
@@ -139,7 +140,9 @@ export default function App() {
       </header>
       ) : null}
 
-      <ViewportController />
+      {/* No open project → the script-first landing page; otherwise the
+          responsive workspace (canvas on desktop, checklist on mobile). */}
+      {project === null ? <Home /> : <ViewportController />}
 
       {mode === 'mobile' ? <BottomNav /> : null}
 
@@ -148,6 +151,18 @@ export default function App() {
       {activeModal === 'parse' ? (
         <Modal title="Parse screenplay" onClose={close}>
           <ScriptInputPanel />
+        </Modal>
+      ) : null}
+
+      {activeModal === 'aiconfig' ? (
+        <Modal
+          title="AI Configuration"
+          onClose={() => {
+            useAppStore.getState().setPendingScript(null)
+            close()
+          }}
+        >
+          <AiConfigPanel />
         </Modal>
       ) : null}
 

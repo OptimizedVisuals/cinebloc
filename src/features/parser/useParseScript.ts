@@ -43,10 +43,9 @@ export function useParseScript(): ParseResult {
 
     const store = useAppStore.getState()
     const { settings } = store
+    // Routing on a missing key is the caller's job — this hook only parses.
     if (!settings.api_key.trim()) {
-      store.pushToast('Add your API key in Settings to parse (BYOK).', 'error')
-      store.setActiveModal('settings')
-      setError('No API key configured.')
+      setError('Add your API key to parse (BYOK).')
       setStatus('error')
       return null
     }

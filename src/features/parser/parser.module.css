@@ -4,6 +4,29 @@
   gap: var(--space-3);
 }
 
+/* Script-first landing card: field + one primary action. */
+.firstCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.firstInput {
+  width: 100%;
+  min-height: 22vh;
+  max-height: 40vh;
+  font-family: var(--mono);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+}
+
+/* Lightweight AI configuration modal (BYOK only). */
+.aiConfig {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
 .row {
   display: flex;
   align-items: center;

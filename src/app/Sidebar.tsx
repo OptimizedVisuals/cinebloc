@@ -89,9 +89,6 @@ export function Sidebar() {
             <path d="M1 17.5h12" />
             <rect x="16.5" y="8" width="6" height="12" rx="1.5" />
           </svg>
-          <span className={styles.label} aria-hidden="true">
-            Sync
-          </span>
         </StripItem>
 
         <StripItem

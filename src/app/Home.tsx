@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react'
 import type { Project } from '@/kernel'
+import { ScriptFirstCard } from '@/features/parser'
 import { openProject } from '@/state/projectActions'
 import { getServices } from '@/state/services'
-import { useAppStore } from '@/state/store'
 import { Button, GridIcon } from '@/ui'
 import styles from './app.module.css'
 
-/** Homepage (feedback round): the app opens HERE, not inside a board. */
+/**
+ * No-project landing page (rendered by the app shell when nothing is open).
+ * The script-first card is the hero; stored projects sit below for a quick
+ * return to work.
+ */
 export function Home() {
   const [projects, setProjects] = useState<Project[] | null>(null)
   const [lastId, setLastId] = useState<string | null>(null)
-  const setActiveModal = useAppStore((s) => s.setActiveModal)
 
   useEffect(() => {
     let cancelled = false
@@ -44,19 +47,9 @@ export function Home() {
           <GridIcon size={34} />
         </span>
         <h1 className={styles.homeTitle}>RecBay</h1>
-        <p className={styles.homeLead}>
-          Paste a screenplay, get a shot list you can actually shoot from. Parsed on this
-          device with your own AI key — scripts, shots and images never leave it.
-        </p>
-        <div className={styles.parseBtnWrap}>
-          <Button
-            variant="primary"
-            onClick={() => setActiveModal('parse')}
-            data-testid="home-parse"
-            style={{ width: '100%' }}
-          >
-            Parse a script
-          </Button>
+        <p className={styles.homeLead}>Turn screenplays into interactive shot lists.</p>
+        <div className={styles.homeFirstCard}>
+          <ScriptFirstCard />
         </div>
       </section>
 

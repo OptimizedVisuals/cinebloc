@@ -189,27 +189,11 @@
   text-align: center;
 }
 
-/* Full-width, high-contrast touch target for one-handed tapping. */
-.parseBtnWrap {
-  display: flex;
-  justify-content: center;
+/* The script field is the hero action on the landing view. */
+.homeFirstCard {
   width: 100%;
-  max-width: 480px;
-}
-
-.homeActions {
-  display: flex;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-  justify-content: center;
-  width: 100%;
-  max-width: 480px;
-}
-
-.homeActions .button {
-  flex: 1 1 0;
-  min-width: 0;
-  justify-content: center;
+  max-width: 560px;
+  text-align: left;
 }
 
 .homeProjects {
@@ -365,30 +349,19 @@
   line-height: 1.6;
 }
 
-.cardActions {
-  display: flex;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-}
-
-.steps {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.skipLink {
+  align-self: center;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text-faint);
   font-size: var(--fs-sm);
-  color: var(--text-dim);
+  text-decoration: underline;
+  cursor: pointer;
 }
 
-.step {
-  display: flex;
-  gap: 8px;
-  align-items: baseline;
-}
-
-.stepNo {
-  font-family: var(--mono);
-  color: var(--accent);
-  font-weight: 700;
+.skipLink:hover {
+  color: var(--text);
 }
 
 /* ── Lock screen ────────────────────────────────────────────────────── */

@@ -244,23 +244,17 @@
   font-size: 15px;
 }
 
-.privacy {
-  display: flex;
-  align-items: flex-start;
+.trustBadge {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg-card);
   font-size: var(--fs-sm);
-  color: var(--text-dim);
-  line-height: 1.5;
-}
-
-.privacyInline {
-  border-top: 1px dashed var(--line);
-  padding-top: var(--space-3);
-  margin-top: var(--space-4);
-}
-
-.privacyStrong {
-  display: block;
-  color: var(--text);
   font-weight: 600;
+  color: var(--text);
 }

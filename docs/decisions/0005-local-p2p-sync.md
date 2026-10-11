@@ -143,13 +143,45 @@ protocol validation, pairing codes); DB v2 with the encrypted `synclog`;
 persistent device identity; the change-log tap (edits, creates, deletes,
 undo/redo, import, assets, whitelisted settings; guards for remote apply,
 hydration and vault lock); the journal (restart recovery, relay to a third
-device, duplicate rejection); pending-per-peer counts.
+device, duplicate rejection); pending-per-peer counts; the **WebRTC
+data-channel transport** (`adapters/sync-webrtc`, LAN-only ICE, mDNS host
+candidates); **QR and paste signalling in both directions**, with invitation
+expiry reported in words; and the **sync engine** (`state/sync/engine.ts`:
+manifest exchange, snapshot in batches, incremental ops, chunked asset bytes,
+acknowledgement only after the receiver has written durably, tombstones,
+duplicate rejection, disconnect handling, vault-lock blocking).
 
-Not implemented yet: WebRTC transport, QR/LAN carriers, the sync engine
-(manifest exchange, full snapshot with progress, incremental transfer), the
-Devices & Sync UI, the PWA install, and the bridge. Until those land, the app
-makes no claim about connection state beyond “off”/“waiting”, and nothing in
-the UI promises automatic reconnection.
+Verified end to end in two browser instances on separate origins (separate
+`IndexedDB`, a real `RTCPeerConnection`): the first sync moved a project, eight
+shots and six PNG assets (636 KB, byte-identical by SHA-256) from a seeded
+device to an empty one, and a later session carried one edit in each direction
+as operations only — pending counts cleared on acknowledgement and no snapshot
+was re-sent. Both devices compared the same six-digit code before syncing.
+
+Not implemented yet: the LAN bridge and automatic discovery (deliberately out
+of this increment), the Devices & Sync UI (only the diagnostic panel in
+`features/sync` exists: status, pending count, payloads, QR, progress), the PWA
+install, and a device list with rename/forget. Until those land, the app makes
+no claim about connection state beyond “off”/“waiting”, and nothing in the UI
+promises automatic reconnection.
+
+Known gaps, stated plainly:
+
+* **No session has run between two separate physical devices.** All browser
+  verification used two instances on one machine, which is why host ICE
+  candidates and mDNS resolution across a real LAN remain untested. Until that
+  is done, the app must not claim real-device sync works.
+* **The receiving device does not switch its workspace** to a project that
+  arrived by sync. The records are durable immediately and the project is in
+  History (verified: opening it renders the received images), but the user
+  opens it themselves — auto-opening while someone is editing another project
+  is a decision for the Devices & Sync increment.
+* **Both devices default to the same generated name** (“My PC”), so the status
+  line can read “Paired with My PC” on either side. Renaming belongs to the
+  device-list UI.
+* **Pending counts only include recorded operations.** A change still inside
+  the tap's flush window is not counted yet, and with no trusted peer known the
+  count is zero by definition, so it is not proof that nothing is outstanding.
 
 ## Alternatives rejected
 
