@@ -1,0 +1,161 @@
+/* Full-screen overlay; the card is nearly full-bleed so the arrows can
+ * live on the left and right edges — always within one-handed reach. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: rgba(4, 6, 10, 0.88);
+  cursor: zoom-out;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.6);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+ _overflow: hidden;
+}
+
+/* Arrow buttons pinned to the far left/right edges. */
+.arrowLeft {
+  position: absolute;
+  left: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: rgba(4, 6, 10, 0.85);
+  color: var(--accent);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.arrowLeft:hover {
+  background: rgba(0, 212, 255, 0.2);
+  color: var(--accent);
+}
+
+.arrowRight {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: rgba(4, 6, 10, 0.85);
+  color: var(--accent);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.arrowRight:hover {
+  background: rgba(0, 212, 255, 0.2);
+  color: var(--accent);
+}
+
+/* Image nearly fills the card. */
+.imgWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.imgPlaceholder {
+  color: var(--text-faint);
+  font-size: var(--fs-sm);
+  text-align: center;
+  padding: var(--space-6);
+}
+
+/* Footer with slide counter + shot label. */
+.meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  color: var(--text);
+  font-size: var(--fs-sm);
+}
+
+.counter {
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.shotLabel {
+  color: var(--text-dim);
+  max-width: 420px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.close {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 4;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}

@@ -1,0 +1,106 @@
+/* Device sync panel (ADR 0005) — card conventions follow settings. */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.helper {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.helperMono {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: var(--fs-sm);
+  color: var(--text-faint);
+  word-break: break-all;
+}
+
+.error {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--danger);
+  line-height: 1.5;
+}
+
+.settingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.settingText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.settingLabel {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* The payload is one long unbroken line: mono + break-all makes it usable. */
+.payload {
+  font-family: var(--mono);
+  font-size: var(--fs-sm);
+  word-break: break-all;
+}
+
+.qr {
+  width: min(240px, 60vw);
+  height: auto;
+  align-self: center;
+  background: #ffffff;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+}
+
+.code {
+  font-family: var(--mono);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+}

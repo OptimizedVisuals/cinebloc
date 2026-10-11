@@ -1,0 +1,961 @@
+.viewport {
+  position: relative;
+  flex: 1;
+  overflow: auto;
+  height: 100%;
+  cursor: grab;
+  /* Radial vignette (claim 3): soft radial-gradient anchor glow */
+  background-color: var(--bg);
+  background-image: radial-gradient(
+    ellipse 70% 60% at 50% 40%,
+    rgba(0, 212, 255, 0.05),
+    transparent 70%
+  );
+}
+
+.panning {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.gridLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Dotted lattice that makes spatial positions legible */
+  background-image: radial-gradient(circle at 1px 1px, var(--grid-dot) 1.1px, transparent 1.6px);
+  background-size: 26px 26px;
+}
+
+.board {
+  position: relative;
+  min-width: 1800px;
+  min-height: 1400px;
+  padding: 0;
+}
+
+.card {
+  position: absolute;
+  width: 300px;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  user-select: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.5);
+  z-index: 5;
+}
+
+.cardDragging {
+  opacity: 0.85;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6);
+  z-index: 10;
+}
+
+.dragOver {
+  outline: 2px dashed var(--accent);
+  outline-offset: 2px;
+}
+
+.cardDone {
+  opacity: 0.55;
+}
+
+.cardDone .action {
+  text-decoration: line-through;
+  text-decoration-color: var(--text-faint);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  cursor: grab;
+  background: var(--bg-elevated);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.cardHeader:active {
+  cursor: grabbing;
+}
+
+.shotNo {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  color: var(--accent);
+}
+
+.scene {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 170px;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Hit area ≈30px tall/wide; negative margins keep the header line height
+   unchanged, so the popover keeps its anchor. */
+.notesBtn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 7px;
+  margin: -8px 0;
+  border: 1px solid transparent;
+  background: none;
+  font-size: 14px;
+  line-height: 1;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 120ms ease, border-color 120ms ease;
+}
+
+.notesBtn:hover {
+  opacity: 1;
+}
+
+.notesBtnHas {
+  opacity: 1;
+  border-color: var(--line-strong);
+  border-radius: 4px;
+  background: var(--accent-soft);
+}
+
+.notesBtnOn {
+  opacity: 1;
+  border-color: var(--accent);
+  border-radius: 4px;
+}
+
+/* Notes popover — pops up under the header, closes via Notes or the ✕ */
+.notesPop {
+  position: absolute;
+  top: 36px;
+  right: 8px;
+  width: min(280px, calc(100% - 16px));
+  background: var(--bg-elevated);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+  padding: 8px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.notesPopHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* Clear corner close target on the popover. */
+.notesClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 7px;
+  margin: -5px -7px -5px 0;
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.notesClose:hover {
+  color: var(--text);
+  background: var(--bg-card-hover);
+}
+
+.notesArea {
+  width: 100%;
+  resize: vertical;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  padding: 6px 8px;
+  font-size: var(--fs-sm);
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+.notesArea:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.cardNotes {
+  z-index: 9;
+}
+
+.cardBody {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.chip {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid rgba(0, 212, 255, 0.35);
+}
+
+.chipNeutral {
+  background: var(--bg-elevated);
+  color: var(--text-dim);
+  border-color: var(--line-strong);
+}
+
+.action {
+  font-size: var(--fs-sm);
+  color: var(--text);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.character {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--info);
+}
+
+/* Card footer: Done + Edit buttons. */
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  border-top: 1px solid var(--line);
+}
+
+.footerBtn {
+  background: none;
+  border: 1px solid var(--line-strong);
+  color: var(--text-dim);
+  font-size: 11px;
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  cursor: pointer;
+}
+
+.footerBtn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text);
+}
+
+.doneBtn {
+  cursor: pointer;
+}
+
+.doneBtnOn {
+  color: var(--accent);
+  border-color: var(--accent);
+  font-weight: 700;
+  background: var(--accent-soft);
+}
+
+.doneBtnOn:hover {
+  background: rgba(0, 212, 255, 0.2);
+}
+
+.thumbs {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  text-align: center;
+  color: var(--text-dim);
+  padding: var(--space-5);
+  pointer-events: none;
+}
+
+.emptyTitle {
+  font-size: var(--fs-xl);
+  color: var(--text);
+  font-weight: 700;
+}
+
+.emptyHint {
+  max-width: 420px;
+  font-size: var(--fs-md);
+}
+
+.emptyActions {
+  display: flex;
+  gap: var(--space-3);
+  pointer-events: auto;
+}
+
+/* Empty board must fit the first screen exactly — no scrolling */
+.boardEmpty {
+  min-width: 100%;
+  min-height: 100%;
+}
+
+/* Project chooser on the empty board */
+.emptyProjects {
+  pointer-events: auto;
+  width: min(440px, 90%);
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.emptyProjectsTitle {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.emptyList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.emptyProjectBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.emptyProjectBtn:hover,
+.emptyProjectBtn:focus-visible {
+  border-color: var(--accent);
+  background: var(--bg-card-hover);
+  outline: none;
+}
+
+.emptyProjectTitle {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.emptyProjectMeta {
+  font-size: 11px;
+  color: var(--text-faint);
+  flex: none;
+}
+
+/* Shot editor modal */
+.editorGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-3);
+}
+
+.editorFull {
+  grid-column: 1 / -1;
+}
+
+.editorActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.assetStrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* --- Connection graph (nodes / threads) --- */
+.edges {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 7;
+}
+
+.linkLine {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  opacity: 0.8;
+  pointer-events: stroke;
+  transition: opacity 120ms ease, stroke-width 120ms ease;
+}
+
+.linkG:hover .linkLine {
+  opacity: 1;
+  stroke-width: 2.4;
+}
+
+.linkAi .linkLine {
+  stroke: var(--info);
+  stroke-dasharray: 6 5;
+}
+
+.linkHandle {
+  fill: var(--bg-elevated);
+  stroke: var(--accent);
+  stroke-width: 2;
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+  transition: opacity 120ms ease;
+}
+
+.linkG:hover .linkHandle {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.linkRemove {
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+  transition: opacity 120ms ease;
+}
+
+.linkG:hover .linkRemove {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.linkRemove circle {
+  fill: var(--bg-elevated);
+  stroke: var(--danger);
+  stroke-width: 1.5;
+}
+
+.linkRemove text {
+  fill: var(--danger);
+  font-size: 11px;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.tempLine {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.8;
+  stroke-dasharray: 7 5;
+  opacity: 0.9;
+}
+
+.tempTip {
+  fill: var(--accent);
+  opacity: 0.9;
+}
+
+/* Edge nodes on cards */
+.node {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: 2px solid var(--accent);
+  opacity: 0.5;
+  z-index: 8;
+  cursor: crosshair;
+  transition: transform 100ms ease, opacity 100ms ease;
+}
+
+.node:hover {
+  opacity: 1;
+  transform: scale(1.3);
+}
+
+.nodeOn {
+  background: var(--accent);
+  opacity: 0.95;
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.7);
+}
+
+.node[data-side='top'] {
+  top: -7px;
+  left: 50%;
+  margin-left: -6px;
+}
+
+.node[data-side='right'] {
+  right: -7px;
+  top: 50%;
+  margin-top: -6px;
+}
+
+.node[data-side='bottom'] {
+  bottom: -7px;
+  left: 50%;
+  margin-left: -6px;
+}
+
+.node[data-side='left'] {
+  left: -7px;
+  top: 50%;
+  margin-top: -6px;
+}
+
+.linkTarget {
+  outline: 2px dashed var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.15);
+}
+
+/* Setup badge in card header */
+.setupChip {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--info-soft, rgba(122, 184, 255, 0.15));
+  color: var(--info);
+  border: 1px solid rgba(122, 184, 255, 0.35);
+  flex: none;
+}
+
+/* Minimal dock: mode capsule + slideshow trigger, fixed bottom-right. */
+.dock {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Compact capsule showing the current board mode (icon + short label). */
+.modeCapsule {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  border-radius: 999px;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), 0 0 14px rgba(0, 212, 255, 0.12);
+  transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.modeCapsule:hover {
+  border-color: var(--accent);
+  background: var(--bg-card-hover);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), 0 0 18px rgba(0, 212, 255, 0.3);
+}
+
+.modeCapsule svg {
+  flex: none;
+}
+
+/* Hover tooltip — full mode name pops out above the capsule. */
+.modeCapsuleTip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 5px 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.modeCapsule:hover .modeCapsuleTip,
+.modeCapsule:focus-visible .modeCapsuleTip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Icon-only slideshow trigger beside the capsule. */
+.dockBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--text-dim);
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  transition: border-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
+}
+
+.dockBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), 0 0 14px rgba(0, 212, 255, 0.3);
+}
+
+/* Condensed stat badge: "2 Setups • 8 Shots Total" — hugs its content. */
+.orderStat {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 6px 14px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  border-radius: 999px;
+  margin-bottom: var(--space-3);
+}
+
+.orderStatText {
+  font-family: var(--mono);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+.orderStatDot {
+  color: var(--text-faint);
+  font-size: 10px;
+}
+
+.orderStatSave {
+  font-family: var(--mono);
+  font-size: var(--fs-sm);
+  color: var(--ok);
+}
+
+/* Board-mode switch inside the planner (Default / Fastest / Custom). */
+.orderModes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: var(--space-4);
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+}
+
+.orderModeLabel {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.orderModeSeg {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.orderModeBtn {
+  flex: 1;
+  min-width: 84px;
+  padding: 8px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  color: var(--text-dim);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.orderModeBtn:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.orderModeBtnOn {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Single concise helper line under the mode tabs. */
+.orderModeHint {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--text-faint);
+  line-height: 1.4;
+}
+
+.orderList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.orderItem {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}
+
+.orderBadge {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  border-radius: 999px;
+  padding: 2px 8px;
+  flex: none;
+}
+
+.orderMain {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.orderLabel {
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  color: var(--text);
+}
+
+.orderShots {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.orderCount {
+  font-size: 11px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  flex: none;
+}
+
+/* Equal-width action grid: [Link] [Remove AI] [ⓘ + Close]. */
+.orderActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  align-items: stretch;
+}
+
+.orderActionBtn {
+  min-width: 0;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.orderInfoWrap {
+  display: flex;
+  gap: var(--space-2);
+  align-items: stretch;
+}
+
+.orderInfoBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  flex: none;
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+}
+
+.orderInfoBtn:hover,
+.orderInfoBtn[aria-expanded='true'] {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* Expandable info tooltip — the old dense instructions, tucked away. */
+.orderInfoPop {
+  margin-top: var(--space-3);
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.orderInfoPop p {
+  margin: 0;
+}
+
+.orderInfoHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.orderInfoClose {
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  font-size: 13px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.orderInfoClose:hover {
+  color: var(--text);
+  background: var(--bg-card-hover);
+}
+
+@media (max-width: 640px) {
+  .orderActions {
+    grid-template-columns: 1fr;
+  }
+
+  .orderInfoWrap {
+    width: 100%;
+  }
+
+  .orderInfoWrap .orderActionBtn {
+    flex: 1;
+  }
+}
+
+.dropHint {
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  font-size: var(--fs-sm);
+  color: var(--text-faint);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+
+.dropHint:hover,
+.dropHint:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+  outline: none;
+}

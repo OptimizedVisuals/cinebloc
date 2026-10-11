@@ -1,0 +1,37 @@
+/* RecBay design tokens — single source for colors, spacing, type. */
+:root {
+  --bg: #000000;
+  --bg-elevated: #0a0d10;
+  --bg-card: #111418;
+  --bg-card-hover: #1a1f26;
+  --line: #1d232b;
+  --line-strong: #2a3340;
+  --text: #f2f4f7;
+  --text-dim: #9aa6b2;
+  --text-faint: #6b7684;
+  --accent: #00d4ff;
+  --accent-ink: #00121c;
+  --accent-soft: rgba(0, 212, 255, 0.12);
+  --ok: #4ade80;
+  --ok-soft: rgba(74, 222, 128, 0.14);
+  --danger: #ff7a7a;
+  --danger-soft: rgba(255, 122, 122, 0.14);
+  --info: #7ab8ff;
+  --info-soft: rgba(122, 184, 255, 0.14);
+  --grid-dot: rgba(0, 212, 255, 0.18);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+  --font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'SF Mono', 'Cascadia Code', 'JetBrains Mono', ui-monospace, Consolas, monospace;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --fs-sm: 12px;
+  --fs-md: 14px;
+  --fs-lg: 18px;
+  --fs-xl: 24px;
+}

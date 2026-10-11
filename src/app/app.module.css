@@ -1,0 +1,468 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Desktop: the fixed 64px icon strip owns the left edge; the workspace
+   (and Home) is inset so nothing hides beneath it. */
+.shellWide {
+  padding-left: 64px;
+}
+
+/* ── App bar: brand + title left, security lock right ─────────────────── */
+.appbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 8px 14px;
+  padding-top: calc(8px + env(safe-area-inset-top));
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--line);
+  z-index: 20;
+}
+
+.appbarLefts {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  font-size: var(--fs-lg);
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+}
+
+.brand:hover {
+  color: var(--accent);
+}
+
+.brandMark {
+  display: inline-flex;
+  align-items: center;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.brandText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pageTitle {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
+}
+
+.appbarRights {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: none;
+  min-width: 0;
+}
+
+.lockBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  white-space: nowrap;
+}
+
+/* ── Bottom navigation (mobile, thumb-friendly) ───────────────────────── */
+.nav {
+  display: flex;
+  justify-content: space-around;
+  gap: var(--space-2);
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  background: var(--bg-elevated);
+  border-top: 1px solid var(--line);
+}
+
+.navBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 10px 8px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 52px;
+}
+
+.navBtn:hover {
+  color: var(--text);
+  background: var(--bg-card-hover);
+}
+
+.navBtnOn {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.navBtnOn:hover {
+  background: var(--accent-soft);
+}
+
+.navBtn svg,
+.navBtn span {
+  display: block;
+}
+
+/* ── Homepage — landing view when no project is open ──────────────────── */
+.home {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  padding: clamp(24px, 6vh, 64px) var(--space-4) 64px;
+  background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(0, 212, 255, 0.07), transparent 70%);
+}
+
+.homeHero {
+  width: min(640px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-3);
+}
+
+.homeMark {
+  display: inline-flex;
+  align-items: center;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.homeTitle {
+  margin: 0;
+  font-size: clamp(30px, 6vw, 42px);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+
+.homeLead {
+  margin: 0;
+  max-width: 560px;
+  color: var(--text-dim);
+  line-height: 1.65;
+  font-size: var(--fs-md);
+  text-align: center;
+}
+
+/* Full-width, high-contrast touch target for one-handed tapping. */
+.parseBtnWrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 480px;
+}
+
+.homeActions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 480px;
+}
+
+.homeActions .button {
+  flex: 1 1 0;
+  min-width: 0;
+  justify-content: center;
+}
+
+.homeProjects {
+  width: min(640px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.homeContinue {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  background: var(--bg-elevated);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+.homeContinueMeta {
+  flex: 1 1 100%;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.homeContinueTitle {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.homeProjectsTitle {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.homeHint {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+
+.homeList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.homeProjectBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 12px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: var(--fs-md);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.homeProjectBtn:hover {
+  border-color: var(--accent);
+  background: var(--bg-card-hover);
+}
+
+.homeProjectTitle {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+
+.homeProjectMeta {
+  flex: none;
+  font-family: var(--mono);
+  font-size: var(--fs-sm);
+  color: var(--text-faint);
+}
+
+/* ── Splash ──────────────────────────────────────────────────────────── */
+.splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  height: 100%;
+  color: var(--text-dim);
+}
+
+.splashTitle {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  color: var(--text);
+}
+
+/* ── Onboarding ─────────────────────────────────────────────────────── */
+.onboarding {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(8, 9, 11, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.card {
+  width: min(560px, 100%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.cardTitle {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  color: var(--text);
+}
+
+.cardLead {
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.cardActions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+}
+
+.step {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.stepNo {
+  font-family: var(--mono);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ── Lock screen ────────────────────────────────────────────────────── */
+.lockScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--bg);
+  background-image: radial-gradient(
+      ellipse 70% 60% at 50% 40%,
+      rgba(0, 212, 255, 0.06),
+      transparent 70%
+    ),
+    radial-gradient(circle at 1px 1px, var(--grid-dot) 1.1px, transparent 1.6px);
+  background-size: 100% 100%, 26px 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.lockCard {
+  width: min(460px, 100%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.lockForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.lockError {
+  color: var(--danger);
+  font-size: var(--fs-sm);
+  background: var(--danger-soft);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+}
+
+.lockReset {
+  border-top: 1px dashed var(--line);
+  padding-top: var(--space-3);
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+}
+
+.lockResetRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+  margin-top: var(--space-2);
+}
+
+.lockLink {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text-faint);
+  font-size: var(--fs-sm);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.lockLink:hover {
+  color: var(--danger);
+}
+

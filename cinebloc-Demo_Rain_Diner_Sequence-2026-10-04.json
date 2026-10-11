@@ -1,0 +1,168 @@
+{
+  "cinebloc_snapshot": 1,
+  "schema_version": 1,
+  "exported_at": 1791129454026,
+  "project": {
+    "id": "3f47d73f-8830-4b59-988a-d5ffcc84107c",
+    "title": "Demo — Rain Diner Sequence",
+    "script_text": "INT. DINER - NIGHT\n\nAlice waits.",
+    "schema_version": 1,
+    "created_at": 1791129259978,
+    "updated_at": 1791129400650
+  },
+  "shots": [
+    {
+      "id": "2dd9b411-38ac-45ce-8e55-b4c15669efe2",
+      "scene_id": "int-diner-night",
+      "scene_heading": "INT. DINER - NIGHT",
+      "shot_number": 1,
+      "character": null,
+      "action": "Rain streaks the windows as ALICE slides into the corner booth.",
+      "size": "WS",
+      "lens": "24mm",
+      "movement": "STATIC",
+      "position_on_board": {
+        "x": 208,
+        "y": 156
+      },
+      "is_completed": false,
+      "order": 0,
+      "asset_refs": [],
+      "notes": ""
+    },
+    {
+      "id": "3c041e33-a3c2-42fa-a11c-2d9883e58205",
+      "scene_id": "int-diner-night",
+      "scene_heading": "INT. DINER - NIGHT",
+      "shot_number": 2,
+      "character": "ALICE",
+      "action": "Alice checks the door, then the clock above the counter.",
+      "size": "MS",
+      "lens": "35mm",
+      "movement": "STATIC",
+      "position_on_board": {
+        "x": 424,
+        "y": 64
+      },
+      "is_completed": false,
+      "order": 1,
+      "asset_refs": [],
+      "notes": ""
+    },
+    {
+      "id": "c4488622-d3ae-4ba3-b128-032478ed4047",
+      "scene_id": "int-diner-night",
+      "scene_heading": "INT. DINER - NIGHT",
+      "shot_number": 3,
+      "character": "ALICE",
+      "action": "Her fingers tap a nervous rhythm on the Formica tabletop.",
+      "size": "CU",
+      "lens": "50mm",
+      "movement": "DOLLY",
+      "position_on_board": {
+        "x": 784,
+        "y": 64
+      },
+      "is_completed": false,
+      "order": 2,
+      "asset_refs": [],
+      "notes": ""
+    },
+    {
+      "id": "640c2800-d450-4761-a01f-a01fd699e930",
+      "scene_id": "int-diner-night",
+      "scene_heading": "INT. DINER - NIGHT",
+      "shot_number": 4,
+      "character": "WAITRESS",
+      "action": "The WAITRESS sets down coffee without a word.",
+      "size": "OTS",
+      "lens": "40mm",
+      "movement": "HANDHELD",
+      "position_on_board": {
+        "x": 1144,
+        "y": 64
+      },
+      "is_completed": false,
+      "order": 3,
+      "asset_refs": [],
+      "notes": ""
+    },
+    {
+      "id": "4e28a416-401e-490c-9ba5-8dfe12ffa85b",
+      "scene_id": "ext-parking-lot-night",
+      "scene_heading": "EXT. PARKING LOT - NIGHT",
+      "shot_number": 1,
+      "character": null,
+      "action": "The diner glow spills across the flooded lot.",
+      "size": "EWS",
+      "lens": "18mm",
+      "movement": "CRANE",
+      "position_on_board": {
+        "x": 64,
+        "y": 344
+      },
+      "is_completed": false,
+      "order": 4,
+      "asset_refs": [],
+      "notes": ""
+    },
+    {
+      "id": "783da940-d63c-4b0b-8322-e2446b3c3e82",
+      "scene_id": "ext-parking-lot-night",
+      "scene_heading": "EXT. PARKING LOT - NIGHT",
+      "shot_number": 2,
+      "character": "ALICE",
+      "action": "Alice’s POV: a figure waits beside the sedan.",
+      "size": "POV",
+      "lens": "28mm",
+      "movement": "TRACK",
+      "position_on_board": {
+        "x": 424,
+        "y": 344
+      },
+      "is_completed": false,
+      "order": 5,
+      "asset_refs": [],
+      "notes": ""
+    },
+    {
+      "id": "06f2c273-e9e8-4965-a56b-a90d3533664b",
+      "scene_id": "ext-parking-lot-night",
+      "scene_heading": "EXT. PARKING LOT - NIGHT",
+      "shot_number": 3,
+      "character": "ALICE",
+      "action": "Eyes widening — she recognizes him.",
+      "size": "ECU",
+      "lens": "85mm",
+      "movement": "STATIC",
+      "position_on_board": {
+        "x": 784,
+        "y": 344
+      },
+      "is_completed": false,
+      "order": 6,
+      "asset_refs": [],
+      "notes": ""
+    },
+    {
+      "id": "5f279480-c01c-4304-9138-ce30f01864ce",
+      "scene_id": "int-car-night",
+      "scene_heading": "INT. CAR - NIGHT",
+      "shot_number": 1,
+      "character": "ALICE",
+      "action": "Alice locks the doors and exhales.",
+      "size": "MS",
+      "lens": "35mm",
+      "movement": "STATIC",
+      "position_on_board": {
+        "x": 1144,
+        "y": 344
+      },
+      "is_completed": false,
+      "order": 7,
+      "asset_refs": [],
+      "notes": ""
+    }
+  ],
+  "assets": []
+}

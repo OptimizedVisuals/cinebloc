@@ -1,0 +1,479 @@
+.page {
+  flex: 1;
+  overflow-y: auto;
+  height: 100%;
+  -webkit-overflow-scrolling: touch;
+  background: var(--bg);
+}
+
+/* Slim sticky header: title + progress, one metadata line. No mode tabs. */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--line);
+  padding: var(--space-3) var(--space-4);
+  padding-top: calc(var(--space-3) + env(safe-area-inset-top));
+}
+
+.headerRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.title {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.count {
+  font-family: var(--mono);
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+  white-space: nowrap;
+  flex: none;
+}
+
+.progressTrack {
+  margin-top: 8px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 220ms ease;
+}
+
+.headerMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: var(--fs-sm);
+  color: var(--text-faint);
+}
+
+.headerMode {
+  font-family: var(--mono);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+.headerDot {
+  font-size: 10px;
+}
+
+/* Single-column list with real side padding so rows breathe on narrow phones. */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-3) var(--space-3) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.row {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: border-color 120ms ease, background 120ms ease, opacity 120ms ease;
+}
+
+.rowDone {
+  background: var(--bg-elevated);
+  opacity: 0.8;
+}
+
+.rowDone .rowScene,
+.rowDone .detailText {
+  text-decoration: line-through;
+  text-decoration-color: var(--text-faint);
+}
+
+/* Collapsed line: toggle · number · scene + pills · chevron. */
+.rowHead {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px 4px 4px;
+  min-height: 48px;
+}
+
+.rowToggle {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 8px 4px;
+  background: none;
+  border: none;
+  color: inherit;
+  text-align: left;
+}
+
+.rowToggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.rowNo {
+  font-family: var(--mono);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--accent);
+  flex: none;
+}
+
+.rowMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rowScene {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rowTags {
+  display: flex;
+  gap: 5px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 1px 7px;
+  white-space: nowrap;
+}
+
+.rowImageDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+  flex: none;
+}
+
+.chevron {
+  flex: none;
+  color: var(--text-faint);
+  transition: transform 160ms ease, color 160ms ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+  color: var(--accent);
+}
+
+/* --- Expanded accordion (Rows A / B / C) --- */
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  border-top: 1px solid var(--line);
+  background: var(--bg-elevated);
+}
+
+.detailRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* Row A — metadata pills sit together, left-aligned, wrapping as needed. */
+.pillsRow {
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.pillOn,
+.pill {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+
+.pillOn {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid rgba(0, 212, 255, 0.35);
+}
+
+.pill {
+  background: var(--bg-card);
+  color: var(--text-dim);
+  border: 1px solid var(--line-strong);
+}
+
+/* Row B — never clipped: wraps naturally, comfortable line height. */
+.detailText {
+  margin: 0;
+  font-size: var(--fs-md);
+  line-height: 1.55;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.detailNotes {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  color: var(--text-dim);
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 9px 10px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.detailThumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.noImage {
+  font-size: var(--fs-sm);
+  color: var(--text-faint);
+}
+
+.editBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding: 7px 12px;
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--text-dim);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+}
+
+.editBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.footer {
+  padding: var(--space-4) var(--space-4) calc(var(--space-5) + env(safe-area-inset-bottom));
+  font-size: var(--fs-sm);
+  color: var(--text-faint);
+  text-align: center;
+}
+
+/* --- Empty state --- */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  text-align: center;
+  color: var(--text-dim);
+  padding: var(--space-6) var(--space-4);
+  min-height: 60%;
+}
+
+.emptyTitle {
+  font-family: var(--mono);
+  font-size: var(--fs-md);
+  letter-spacing: 0.22em;
+  color: var(--text-faint);
+  font-weight: 600;
+}
+
+.emptyHint {
+  max-width: 380px;
+  line-height: 1.6;
+}
+
+.emptyActions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* --- Mobile edit bottom sheet --- */
+.sheetOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.sheet {
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--radius) var(--radius) 0 0;
+  box-shadow: var(--shadow);
+  animation: sheetUp 200ms ease;
+}
+
+@keyframes sheetUp {
+  from {
+    transform: translateY(16px);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet {
+    animation: none;
+  }
+}
+
+.sheetGrip {
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--line-strong);
+  margin: 8px auto 0;
+  flex: none;
+}
+
+.sheetHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--line);
+  flex: none;
+}
+
+.sheetTitle {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.sheetClose {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 20px;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.sheetClose:hover {
+  background: var(--bg-card-hover);
+  color: var(--text);
+}
+
+.sheetBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sheetScene {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* Two columns where there is room, one on the narrowest phones. */
+.sheetGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-3);
+}
+
+.sheetAssets {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.assetAdd {
+  padding: 9px 14px;
+  background: var(--bg-card);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.assetAdd:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.sheetActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  flex: none;
+}

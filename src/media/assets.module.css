@@ -1,0 +1,78 @@
+.thumbSm {
+  width: 44px;
+  height: 30px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--line-strong);
+}
+
+.thumbLg {
+  width: 100%;
+  max-height: 340px;
+  object-fit: contain;
+  background: #000;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+}
+
+.thumbBtn {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
+  line-height: 0;
+}
+
+/* Tap-to-expand lightbox: card-sized pop-up, ✕ top-right, click anywhere to close */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: rgba(4, 6, 10, 0.82);
+  cursor: zoom-out;
+}
+
+.lightboxCard {
+  position: relative;
+  width: min(90vw, 420px);
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.6);
+  padding: 10px;
+}
+
+.lightboxClose {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lightboxClose:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+.lightboxImg {
+  display: block;
+  width: 100%;
+  max-height: 72vh;
+  object-fit: contain;
+  background: #000;
+  border-radius: var(--radius-sm);
+}
